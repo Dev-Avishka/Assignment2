@@ -1,0 +1,9 @@
+[
+    {
+    "name": "Marvel Heroes",
+    "options": [{"name": "Captain America", "votes": 3},
+                {"name": "Thor", "votes": 2},
+                {"name": "Ironman", "votes": 1},
+                {"name": "Hulk", "votes": 2}]
+    }
+]
