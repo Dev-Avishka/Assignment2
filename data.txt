@@ -1,3 +1,4 @@
+
 [
     {
         "index": 0,
@@ -5,19 +6,19 @@
         "options": [
             {
                 "name": "Captain America",
-                "votes": 3
-            },
-            {
-                "name": "Thor",
-                "votes": 2
-            },
-            {
-                "name": "Ironman",
                 "votes": 1
             },
             {
+                "name": "Thor",
+                "votes": 0
+            },
+            {
+                "name": "Ironman",
+                "votes": 0
+            },
+            {
                 "name": "Hulk",
-                "votes": 2
+                "votes": 0
             }
         ]
     }

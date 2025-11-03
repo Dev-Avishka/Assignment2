@@ -1,99 +1,80 @@
+
+
+'''
+
+omg.py - One Must Go - GUI client code
+This file will read from data.txt and provide a GUI for users to vote on categories.
+when category is displayed, user can select one option  to vote
+once voted the program shall increment the vote count for that option and save back to data.txt
+and then move to next category
+each item in a category is a button
+each button when clicked will register a vote for that option
+each button will be in a grid layout
+and no Next button to move to next category, it will move automatically after voting
+if no more categories, display a message and ask if the user wants to exit with a button saying exit
+this program will be OOP
+and use TKINTER for GUI
+Shall display "One Must Go " on top
+Shall display the Category as "Category: <category name>"
+'''
+
+import json
 import tkinter as tk
-from tkinter import ttk
-from typing import Optional
+from tkinter import messagebox
+file_path = 'data.txt'
+# load data at start
+try:
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+except:
+    data = []
+def save_data(data):
+    #save data back to file
+    with open(file_path, 'w') as file:
+        json.dump(data, file, indent=4)
+class OneMustGoApp:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("One Must Go Voting")
+        self.master.geometry("400x300")
 
-"""
-omg.py - Tkinter application class starter
+        title_label = tk.Label(master, text="One Must Go", font=("Helvetica", 20, "bold"))
+        title_label.pack(pady=10)
+        self.current_index = 0
+        self.create_widgets()
+        self.show_category()
 
-Run:
-    python omg.py
-"""
+    def create_widgets(self):
+        
+        self.category_label = tk.Label(self.master, text="", font=("Helvetica", 16))
+        self.category_label.pack(pady=10)
+        
+        self.buttons_frame = tk.Frame(self.master)
+        self.buttons_frame.pack(pady=10)
 
+    def show_category(self):
+        if self.current_index >= len(data):
+            messagebox.showinfo("End", "No more categories to vote on. Thank you!")
+            self.master.quit()
+            return
 
-class App(tk.Tk):
-    """Simple Tkinter application skeleton using a class-based structure."""
+        category = data[self.current_index]
+        self.category_label.config(text=f"Category: {category['name']}")
 
-    def __init__(self, title: str = "Tkinter App", size: str = "800x600") -> None:
-        super().__init__()
-        self.title(title)
-        self.geometry(size)
+        for widget in self.buttons_frame.winfo_children():
+            widget.destroy()
 
-        # Optional state
-        self._status_text = tk.StringVar(value="Ready")
+        for option in category['options']:
+            btn = tk.Button(self.buttons_frame, text=option['name'], width=20,
+                            command=lambda opt=option: self.vote(opt))
+            btn.pack(pady=5)
 
-        # Build UI
-        self._create_menu()
-        self._create_toolbar()
-        self._create_main()
-        self._create_statusbar()
-
-        # Bindings
-        self.bind("<Control-q>", lambda e: self.quit())
-        self.protocol("WM_DELETE_WINDOW", self.on_close)
-
-    def _create_menu(self) -> None:
-        menubar = tk.Menu(self)
-        file_menu = tk.Menu(menubar, tearoff=False)
-        file_menu.add_command(label="New", command=self.on_new)
-        file_menu.add_command(label="Open...", command=self.on_open)
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.on_close)
-        menubar.add_cascade(label="File", menu=file_menu)
-
-        help_menu = tk.Menu(menubar, tearoff=False)
-        help_menu.add_command(label="About", command=self.on_about)
-        menubar.add_cascade(label="Help", menu=help_menu)
-
-        self.config(menu=menubar)
-
-    def _create_toolbar(self) -> None:
-        toolbar = ttk.Frame(self, padding=(2, 2))
-        btn_new = ttk.Button(toolbar, text="New", command=self.on_new)
-        btn_open = ttk.Button(toolbar, text="Open", command=self.on_open)
-        btn_new.pack(side="left", padx=2)
-        btn_open.pack(side="left", padx=2)
-        toolbar.pack(side="top", fill="x")
-
-    def _create_main(self) -> None:
-        # Main content area - replace with your widgets/layout
-        main_frame = ttk.Frame(self, padding=(8, 8))
-        label = ttk.Label(main_frame, text="Hello, Tkinter!", font=("Segoe UI", 14))
-        label.pack(anchor="center", expand=True)
-        sample_button = ttk.Button(main_frame, text="Click me", command=self.on_click)
-        sample_button.pack(pady=10)
-        main_frame.pack(fill="both", expand=True)
-
-    def _create_statusbar(self) -> None:
-        status = ttk.Frame(self, relief="sunken")
-        lbl = ttk.Label(status, textvariable=self._status_text, anchor="w")
-        lbl.pack(fill="x", padx=4)
-        status.pack(side="bottom", fill="x")
-
-    # Event handlers / actions -------------------------------------------------
-    def set_status(self, text: str, timeout: Optional[int] = 3000) -> None:
-        """Set status text; optionally clear after timeout milliseconds."""
-        self._status_text.set(text)
-        if timeout:
-            self.after_cancel(getattr(self, "_status_after_id", None))
-            self._status_after_id = self.after(timeout, lambda: self._status_text.set(""))
-
-    def on_new(self) -> None:
-        self.set_status("New action triggered", 2000)
-
-    def on_open(self) -> None:
-        self.set_status("Open action triggered", 2000)
-
-    def on_about(self) -> None:
-        tk.messagebox.showinfo("About", "Tkinter App - Starter template")
-
-    def on_click(self) -> None:
-        self.set_status("Button clicked", 1500)
-
-    def on_close(self) -> None:
-        # place cleanup logic here
-        self.destroy()
-
-
+    def vote(self, option):
+        option['votes'] += 1
+        save_data(data)
+        self.current_index += 1
+        self.show_category()
 if __name__ == "__main__":
-    app = App(title="OMG - Tkinter Starter")
-    app.mainloop()
+    root = tk.Tk()
+    app = OneMustGoApp(root)
+    root.mainloop()
